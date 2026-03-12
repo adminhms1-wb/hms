@@ -1,0 +1,444 @@
+<!-- Cleaning Schedule Tab -->
+<div v-if="activeTab === 'cleaning-schedule'" class="tab-content">
+    <div class="content-grid">
+        <section class="content-card">
+            <div class="card-header">
+                <h2>Cleaning Schedule</h2>
+                <p>Manage housekeeping tasks and assign staff</p>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Room *</label>
+                        <select v-model="taskForm.room_id">
+                            <option value="">Select a room</option>
+                            <option v-for="room in rooms" :key="room?.id || room" :value="room?.id">
+                                {{ room?.room_number }} - {{ room?.room_type?.name || 'N/A' }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Task Type *</label>
+                        <select v-model="taskForm.task_type">
+                            <option value="cleaning">Cleaning</option>
+                            <option value="inspection">Inspection</option>
+                            <option value="linen_change">Linen Change</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="deep_cleaning">Deep Cleaning</option>
+                            <option value="turn_down_service">Turn-down Service</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Date *</label>
+                        <input v-model="taskForm.date" type="date" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Assign Staff</label>
+                        <select v-model="taskForm.staff_id">
+                            <option value="">Select staff</option>
+                            <option v-for="staff in staffList" :key="staff?.id || staff" :value="staff?.id">
+                                {{ staff?.name || 'Unknown' }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select v-model="taskForm.status">
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea v-model="taskForm.notes" rows="2" placeholder="Additional notes"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" @click="resetTaskForm">Clear</button>
+                    <button class="btn btn-primary" @click="saveTask" :disabled="!taskForm.room_id || !taskForm.task_type || !taskForm.date || saving">
+                        {{ saving ? 'Saving...' : (taskForm.id ? 'Update Task' : 'Create Task') }}
+                    </button>
+                </div>
+
+                <div class="filter-chips" style="margin-top: 20px;">
+                    <button
+                        v-for="status in taskStatuses"
+                        :key="status.value"
+                        :class="['chip', { active: activeTaskStatus === status.value }]"
+                        @click="activeTaskStatus = status.value"
+                    >
+                        {{ status.label }}
+                    </button>
+                </div>
+
+                <div v-if="loadingTasks" class="loading-state">
+                    <p>Loading tasks...</p>
+                </div>
+                <div v-else-if="filteredTasks.length === 0" class="empty-state">
+                    <p>No tasks found.</p>
+                </div>
+                <div v-else class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Room</th>
+                                <th>Task Type</th>
+                                <th>Date</th>
+                                <th>Assigned Staff</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="task in filteredTasks" :key="task?.id || task">
+                                <td>
+                                    <strong>{{ task?.room?.room_number || 'N/A' }}</strong>
+                                    <small>{{ task?.room?.room_type?.name || '' }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge badge-info">{{ formatTaskType(task?.task_type) }}</span>
+                                </td>
+                                <td>{{ formatDate(task?.date) }}</td>
+                                <td>{{ task?.staff?.name || 'Unassigned' }}</td>
+                                <td>
+                                    <span :class="['badge', getTaskStatusBadge(task?.status)]">
+                                        {{ task?.status || 'pending' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-outline" @click="editTask(task)">Edit</button>
+                                        <button v-if="task?.status === 'pending'" class="btn btn-sm btn-success" @click="startTask(task)" :disabled="saving">
+                                            Start
+                                        </button>
+                                        <button v-if="task?.status === 'in_progress'" class="btn btn-sm btn-primary" @click="completeTask(task)" :disabled="saving">
+                                            Complete
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" @click="deleteTask(task?.id)" :disabled="saving">Remove</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Room Cleaning Status Tab -->
+<div v-if="activeTab === 'room-status'" class="tab-content">
+    <div class="content-grid">
+        <section class="content-card">
+            <div class="card-header">
+                <h2>Room Cleaning Status</h2>
+                <p>View and update room cleaning status</p>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Filter by Status</label>
+                        <select v-model="roomStatusFilter" @change="fetchRoomsByStatus">
+                            <option value="">All Rooms</option>
+                            <option value="available">Available</option>
+                            <option value="under_cleaning">Under Cleaning</option>
+                            <option value="checked_out">Checked Out</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div v-if="loadingRooms" class="loading-state">
+                    <p>Loading rooms...</p>
+                </div>
+                <div v-else-if="roomsForCleaning.length === 0" class="empty-state">
+                    <p>No rooms found.</p>
+                </div>
+                <div v-else class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Room Number</th>
+                                <th>Room Type</th>
+                                <th>Current Status</th>
+                                <th>Last Cleaned</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="room in roomsForCleaning" :key="room?.id || room">
+                                <td><strong>{{ room?.room_number || 'N/A' }}</strong></td>
+                                <td>{{ room?.room_type?.name || 'N/A' }}</td>
+                                <td>
+                                    <span :class="['badge', getRoomStatusBadge(room?.status)]">
+                                        {{ formatRoomStatus(room?.status) }}
+                                    </span>
+                                </td>
+                                <td>{{ room?.last_cleaned ? formatDate(room.last_cleaned) : 'Never' }}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button v-if="room?.status === 'checked_out'" class="btn btn-sm btn-success" @click="markRoomCleaning(room)" :disabled="saving">
+                                            Mark for Cleaning
+                                        </button>
+                                        <button v-if="room?.status === 'under_cleaning'" class="btn btn-sm btn-primary" @click="markRoomAvailable(room)" :disabled="saving">
+                                            Mark Available
+                                        </button>
+                                        <button class="btn btn-sm btn-outline" @click="createTaskForRoom(room)">Create Task</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Maintenance Issues Tab -->
+<div v-if="activeTab === 'maintenance'" class="tab-content">
+    <div class="content-grid">
+        <section class="content-card">
+            <div class="card-header">
+                <h2>Maintenance Issue Reporting</h2>
+                <p>Report and track maintenance issues</p>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Room *</label>
+                        <select v-model="maintenanceForm.room_id">
+                            <option value="">Select a room</option>
+                            <option v-for="room in rooms" :key="room?.id || room" :value="room?.id">
+                                {{ room?.room_number }} - {{ room?.room_type?.name || 'N/A' }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select v-model="maintenanceForm.priority">
+                            <option value="low">Low</option>
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Assign To</label>
+                        <select v-model="maintenanceForm.assigned_to">
+                            <option value="">Select staff</option>
+                            <option v-for="staff in staffList" :key="staff?.id || staff" :value="staff?.id">
+                                {{ staff?.name || 'Unknown' }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Issue Description *</label>
+                        <textarea v-model="maintenanceForm.issue" rows="3" placeholder="Describe the maintenance issue"></textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Notes</label>
+                        <textarea v-model="maintenanceForm.notes" rows="2" placeholder="Additional notes"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" @click="resetMaintenanceForm">Clear</button>
+                    <button class="btn btn-primary" @click="saveMaintenance" :disabled="!maintenanceForm.room_id || !maintenanceForm.issue || saving">
+                        {{ saving ? 'Saving...' : (maintenanceForm.id ? 'Update Request' : 'Report Issue') }}
+                    </button>
+                </div>
+
+                <div class="filter-chips" style="margin-top: 20px;">
+                    <button
+                        v-for="status in maintenanceStatuses"
+                        :key="status.value"
+                        :class="['chip', { active: activeMaintenanceStatus === status.value }]"
+                        @click="activeMaintenanceStatus = status.value"
+                    >
+                        {{ status.label }}
+                    </button>
+                </div>
+
+                <div v-if="loadingMaintenance" class="loading-state">
+                    <p>Loading maintenance requests...</p>
+                </div>
+                <div v-else-if="filteredMaintenance.length === 0" class="empty-state">
+                    <p>No maintenance requests found.</p>
+                </div>
+                <div v-else class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Room</th>
+                                <th>Issue</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th>Reported By</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="req in filteredMaintenance" :key="req?.id || req">
+                                <td>
+                                    <strong>{{ req?.room?.room_number || 'N/A' }}</strong>
+                                    <small>{{ req?.room?.room_type?.name || '' }}</small>
+                                </td>
+                                <td>{{ req?.issue || 'N/A' }}</td>
+                                <td>
+                                    <span :class="['badge', getPriorityBadge(req?.priority)]">
+                                        {{ req?.priority || 'normal' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span :class="['badge', getMaintenanceStatusBadge(req?.status)]">
+                                        {{ req?.status || 'reported' }}
+                                    </span>
+                                </td>
+                                <td>{{ req?.assigned_to?.name || 'Unassigned' }}</td>
+                                <td>{{ req?.reported_by?.name || 'N/A' }}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-outline" @click="editMaintenance(req)">Edit</button>
+                                        <button v-if="req?.status === 'reported'" class="btn btn-sm btn-info" @click="startMaintenance(req)" :disabled="saving">
+                                            Start
+                                        </button>
+                                        <button v-if="req?.status === 'in_progress'" class="btn btn-sm btn-success" @click="resolveMaintenance(req)" :disabled="saving">
+                                            Resolve
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" @click="deleteMaintenance(req?.id)" :disabled="saving">Remove</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Lost & Found Tab -->
+<div v-if="activeTab === 'lost-found'" class="tab-content">
+    <div class="content-grid">
+        <section class="content-card">
+            <div class="card-header">
+                <h2>Lost & Found Tracking</h2>
+                <p>Track lost and found items</p>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Room</label>
+                        <select v-model="lostFoundForm.room_id">
+                            <option value="">Select a room (optional)</option>
+                            <option v-for="room in rooms" :key="room?.id || room" :value="room?.id">
+                                {{ room?.room_number }} - {{ room?.room_type?.name || 'N/A' }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Item *</label>
+                        <input v-model="lostFoundForm.item" type="text" placeholder="Item description" />
+                    </div>
+                    <div class="form-group">
+                        <label>Found Date *</label>
+                        <input v-model="lostFoundForm.found_date" type="date" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Description</label>
+                        <textarea v-model="lostFoundForm.description" rows="2" placeholder="Detailed description"></textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input v-model="lostFoundForm.location" type="text" placeholder="Where was it found?" />
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select v-model="lostFoundForm.status">
+                            <option value="found">Found</option>
+                            <option value="claimed">Claimed</option>
+                            <option value="unclaimed">Unclaimed</option>
+                            <option value="discarded">Discarded</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" @click="resetLostFoundForm">Clear</button>
+                    <button class="btn btn-primary" @click="saveLostFound" :disabled="!lostFoundForm.item || !lostFoundForm.found_date || saving">
+                        {{ saving ? 'Saving...' : (lostFoundForm.id ? 'Update Item' : 'Add Item') }}
+                    </button>
+                </div>
+
+                <div class="filter-chips" style="margin-top: 20px;">
+                    <button
+                        v-for="status in lostFoundStatuses"
+                        :key="status.value"
+                        :class="['chip', { active: activeLostFoundStatus === status.value }]"
+                        @click="activeLostFoundStatus = status.value"
+                    >
+                        {{ status.label }}
+                    </button>
+                </div>
+
+                <div v-if="loadingLostFound" class="loading-state">
+                    <p>Loading lost and found items...</p>
+                </div>
+                <div v-else-if="filteredLostFound.length === 0" class="empty-state">
+                    <p>No lost and found items found.</p>
+                </div>
+                <div v-else class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Room</th>
+                                <th>Found Date</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in filteredLostFound" :key="item?.id || item">
+                                <td>
+                                    <strong>{{ item?.item || 'N/A' }}</strong>
+                                    <small v-if="item?.description">{{ item.description }}</small>
+                                </td>
+                                <td>{{ item?.room?.room_number || 'N/A' }}</td>
+                                <td>{{ formatDate(item?.found_date) }}</td>
+                                <td>{{ item?.location || 'N/A' }}</td>
+                                <td>
+                                    <span :class="['badge', getLostFoundStatusBadge(item?.status)]">
+                                        {{ item?.status || 'found' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-outline" @click="editLostFound(item)">Edit</button>
+                                        <button v-if="item?.status === 'found'" class="btn btn-sm btn-success" @click="claimLostFound(item)" :disabled="saving">
+                                            Mark Claimed
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" @click="deleteLostFound(item?.id)" :disabled="saving">Remove</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
