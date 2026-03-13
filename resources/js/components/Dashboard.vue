@@ -4,10 +4,10 @@
         <aside class="app-sidebar" :class="{ 'sidebar-mini': sidebarMini }">
             <div class="sidebar-header">
                 <div class="logo-wrapper">
-                    <img 
-                        v-if="hotelLogo" 
-                        :src="hotelLogo" 
-                        alt="Hotel Logo" 
+                    <img
+                        v-if="hotelLogo"
+                        :src="hotelLogo"
+                        alt="Hotel Logo"
                         class="logo-image"
                         @error="handleImageError"
                     />
@@ -16,11 +16,11 @@
                     </div>
                 </div>
             </div>
-            
+
             <nav class="sidebar-menu">
-                <router-link 
-                    :to="{ name: 'dashboard' }" 
-                    class="menu-item" 
+                <router-link
+                    :to="{ name: 'dashboard' }"
+                    class="menu-item"
                     :class="{ active: isDashboardActive }"
                     exact-active-class="active"
                 >
@@ -29,15 +29,15 @@
                     </svg>
                     <span v-if="!sidebarMini">Dashboard</span>
                 </router-link>
-                
+
                 <!-- Users & Permissions Dropdown -->
-                <div 
-                    v-if="(hasPermission('view_users') || hasPermission('view_roles') || hasPermission('manage_system') || isSuperAdmin)" 
+                <div
+                    v-if="(hasPermission('view_users') || hasPermission('view_roles') || hasPermission('manage_system') || isSuperAdmin)"
                     class="menu-dropdown"
                     :class="{ 'dropdown-open': isUsersPermissionsDropdownOpen, 'active': isUsersPermissionsActive }"
                 >
-                    <button 
-                        class="menu-item menu-dropdown-toggle" 
+                    <button
+                        class="menu-item menu-dropdown-toggle"
                         @click="toggleUsersPermissionsDropdown"
                     >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -45,11 +45,11 @@
                             <path d="M10 12C5.58172 12 2 13.7909 2 16V20H18V16C18 13.7909 14.4183 12 10 12Z" stroke="currentColor" stroke-width="2"/>
                         </svg>
                         <span v-if="!sidebarMini">Users & Permissions</span>
-                        <svg 
-                            v-if="!sidebarMini" 
-                            width="16" 
-                            height="16" 
-                            viewBox="0 0 16 16" 
+                        <svg
+                            v-if="!sidebarMini"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
                             fill="none"
                             class="dropdown-arrow"
                             :class="{ 'rotated': isUsersPermissionsDropdownOpen }"
@@ -58,10 +58,10 @@
                         </svg>
                     </button>
                     <div v-if="isUsersPermissionsDropdownOpen && !sidebarMini" class="menu-dropdown-content">
-                        <router-link 
-                            v-if="hasPermission('view_users') || isSuperAdmin" 
-                            :to="{ name: 'users' }" 
-                            class="menu-dropdown-item" 
+                        <router-link
+                            v-if="hasPermission('view_users') || isSuperAdmin"
+                            :to="{ name: 'users' }"
+                            class="menu-dropdown-item"
                             :class="{ active: isUsersActive }"
                             @click="closeUsersPermissionsDropdown"
                         >
@@ -71,10 +71,10 @@
                             </svg>
                             <span>Users</span>
                         </router-link>
-                        <router-link 
-                            v-if="hasPermission('view_roles') || isSuperAdmin" 
-                            :to="{ name: 'roles' }" 
-                            class="menu-dropdown-item" 
+                        <router-link
+                            v-if="hasPermission('view_roles') || isSuperAdmin"
+                            :to="{ name: 'roles' }"
+                            class="menu-dropdown-item"
                             :class="{ active: isRolesActive }"
                             @click="closeUsersPermissionsDropdown"
                         >
@@ -85,10 +85,10 @@
                             </svg>
                             <span>Roles & Permissions</span>
                         </router-link>
-                        <router-link 
-                            v-if="hasPermission('manage_system') || isSuperAdmin" 
-                            :to="{ name: 'permissions' }" 
-                            class="menu-dropdown-item" 
+                        <router-link
+                            v-if="hasPermission('manage_system') || isSuperAdmin"
+                            :to="{ name: 'permissions' }"
+                            class="menu-dropdown-item"
                             :class="{ active: isPermissionsActive }"
                             @click="closeUsersPermissionsDropdown"
                         >
@@ -100,15 +100,15 @@
                         </router-link>
                     </div>
                 </div>
-                
+
                 <!-- Hotel Operations Dropdown -->
-                <div 
+                <div
                     v-if="hasPermission('manage_restaurant') || hasPermission('view_rooms') || hasPermission('view_bookings') || hasPermission('manage_amenities') || hasPermission('manage_housekeeping') || isSuperAdmin"
                     class="menu-dropdown"
                     :class="{ 'dropdown-open': isHotelOperationsDropdownOpen, 'active': isHotelOperationsActive }"
                 >
-                    <button 
-                        class="menu-item menu-dropdown-toggle" 
+                    <button
+                        class="menu-item menu-dropdown-toggle"
                         @click="toggleHotelOperationsDropdown"
                     >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -117,11 +117,11 @@
                             <path d="M7 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                         <span v-if="!sidebarMini">Hotel Operations</span>
-                        <svg 
-                            v-if="!sidebarMini" 
-                            width="16" 
-                            height="16" 
-                            viewBox="0 0 16 16" 
+                        <svg
+                            v-if="!sidebarMini"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
                             fill="none"
                             class="dropdown-arrow"
                             :class="{ 'rotated': isHotelOperationsDropdownOpen }"
@@ -130,10 +130,10 @@
                         </svg>
                     </button>
                     <div v-if="isHotelOperationsDropdownOpen && !sidebarMini" class="menu-dropdown-content">
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_restaurant') || isSuperAdmin"
-                            :to="{ name: 'restaurantOperations' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'restaurantOperations' }"
+                            class="menu-dropdown-item"
                             :class="{ active: isRestaurantOperationsActive }"
                             @click="closeHotelOperationsDropdown"
                         >
@@ -145,10 +145,10 @@
                             </svg>
                             <span>Restaurant Management (POS)</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_rooms') || hasPermission('manage_rooms') || isSuperAdmin"
-                            :to="{ name: 'rooms' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'rooms' }"
+                            class="menu-dropdown-item"
                             :class="{ active: isRoomsActive }"
                             @click="closeHotelOperationsDropdown"
                         >
@@ -159,10 +159,10 @@
                             </svg>
                             <span>Room Management</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_bookings') || hasPermission('create_bookings') || hasPermission('edit_bookings') || isSuperAdmin"
-                            :to="{ name: 'roomReservations' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'roomReservations' }"
+                            class="menu-dropdown-item"
                             :class="{ active: isRoomReservationsActive }"
                             @click="closeHotelOperationsDropdown"
                         >
@@ -174,10 +174,10 @@
                             </svg>
                             <span>Room & Reservation Management</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_bookings') || hasPermission('checkin_guests') || hasPermission('checkout_guests') || isSuperAdmin"
-                            :to="{ name: 'frontDeskOperations' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'frontDeskOperations' }"
+                            class="menu-dropdown-item"
                             :class="{ active: isFrontDeskOperationsActive }"
                             @click="closeHotelOperationsDropdown"
                         >
@@ -189,10 +189,10 @@
                             </svg>
                             <span>Front Desk Operations</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_amenities') || isSuperAdmin"
-                            :to="{ name: 'amenitiesServices' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'amenitiesServices' }"
+                            class="menu-dropdown-item"
                             :class="{ active: isAmenitiesServicesActive }"
                             @click="closeHotelOperationsDropdown"
                         >
@@ -204,10 +204,10 @@
                             </svg>
                             <span>Amenities & Services Management</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_housekeeping') || isSuperAdmin"
-                            :to="{ name: 'housekeeping' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'housekeeping' }"
+                            class="menu-dropdown-item"
                             :class="{ active: isHousekeepingActive }"
                             @click="closeHotelOperationsDropdown"
                         >
@@ -224,15 +224,15 @@
                         </router-link>
                     </div>
                 </div>
-                
+
                 <!-- Stock and Inventory Dropdown -->
-                <div 
+                <div
                     v-if="hasPermission('view_inventory') || hasPermission('manage_inventory') || hasPermission('manage_suppliers') || isSuperAdmin"
                     class="menu-dropdown"
                     :class="{ 'dropdown-open': isStockInventoryDropdownOpen, 'active': isStockInventoryActive }"
                 >
-                    <button 
-                        class="menu-item menu-dropdown-toggle" 
+                    <button
+                        class="menu-item menu-dropdown-toggle"
                         @click="toggleStockInventoryDropdown"
                     >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -242,11 +242,11 @@
                             <path d="M5 12H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                         <span v-if="!sidebarMini">Stock and Inventory</span>
-                        <svg 
-                            v-if="!sidebarMini" 
-                            width="16" 
-                            height="16" 
-                            viewBox="0 0 16 16" 
+                        <svg
+                            v-if="!sidebarMini"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
                             fill="none"
                             class="dropdown-arrow"
                             :class="{ 'rotated': isStockInventoryDropdownOpen }"
@@ -255,10 +255,10 @@
                         </svg>
                     </button>
                     <div v-if="isStockInventoryDropdownOpen && !sidebarMini" class="menu-dropdown-content">
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_inventory') || hasPermission('manage_inventory') || isSuperAdmin"
-                            :to="{ name: 'inventoryStore' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'inventoryStore' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isInventoryStoreActive }"
                             @click="closeStockInventoryDropdown"
@@ -271,10 +271,10 @@
                             </svg>
                             <span>Inventory & Store Management</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_inventory') || hasPermission('manage_housekeeping') || isSuperAdmin"
-                            :to="{ name: 'linenHousekeeping' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'linenHousekeeping' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isLinenHousekeepingActive }"
                             @click="closeStockInventoryDropdown"
@@ -290,10 +290,10 @@
                             </svg>
                             <span>Linen & Housekeeping Items</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_inventory') || hasPermission('manage_amenities') || isSuperAdmin"
-                            :to="{ name: 'amenitiesConsumables' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'amenitiesConsumables' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isAmenitiesConsumablesActive }"
                             @click="closeStockInventoryDropdown"
@@ -306,10 +306,10 @@
                             </svg>
                             <span>Amenities Consumables</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_inventory') || isSuperAdmin"
-                            :to="{ name: 'stockInOut' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'stockInOut' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isStockInOutActive }"
                             @click="closeStockInventoryDropdown"
@@ -322,10 +322,10 @@
                             </svg>
                             <span>Stock In / Out</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_suppliers') || isSuperAdmin"
-                            :to="{ name: 'supplierManagement' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'supplierManagement' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isSupplierManagementActive }"
                             @click="closeStockInventoryDropdown"
@@ -339,10 +339,10 @@
                             </svg>
                             <span>Supplier Management</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_inventory') || hasPermission('manage_inventory') || isSuperAdmin"
-                            :to="{ name: 'stockAlertsTracking' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'stockAlertsTracking' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isStockAlertsTrackingActive }"
                             @click="closeStockInventoryDropdown"
@@ -357,15 +357,15 @@
                         </router-link>
                     </div>
                 </div>
-                
+
                 <!-- Staff & Shift Management Dropdown -->
-                <div 
+                <div
                     v-if="hasPermission('manage_staff') || hasPermission('manage_shifts') || hasPermission('view_attendance') || isSuperAdmin"
                     class="menu-dropdown"
                     :class="{ 'dropdown-open': isStaffShiftDropdownOpen, 'active': isStaffShiftActive }"
                 >
-                    <button 
-                        class="menu-item menu-dropdown-toggle" 
+                    <button
+                        class="menu-item menu-dropdown-toggle"
                         @click="toggleStaffShiftDropdown"
                     >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -377,11 +377,11 @@
                             <circle cx="17" cy="10" r="1" fill="currentColor"/>
                         </svg>
                         <span v-if="!sidebarMini">Staff & Shift Management</span>
-                        <svg 
-                            v-if="!sidebarMini" 
-                            width="16" 
-                            height="16" 
-                            viewBox="0 0 16 16" 
+                        <svg
+                            v-if="!sidebarMini"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
                             fill="none"
                             class="dropdown-arrow"
                             :class="{ 'rotated': isStaffShiftDropdownOpen }"
@@ -390,10 +390,10 @@
                         </svg>
                     </button>
                     <div v-if="isStaffShiftDropdownOpen && !sidebarMini" class="menu-dropdown-content">
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_staff') || isSuperAdmin"
-                            :to="{ name: 'staffProfiles' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'staffProfiles' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isStaffProfilesActive }"
                             @click="closeStaffShiftDropdown"
@@ -405,10 +405,10 @@
                             </svg>
                             <span>Staff Profiles</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_staff') || hasPermission('view_roles') || isSuperAdmin"
-                            :to="{ name: 'roleAssignment' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'roleAssignment' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isRoleAssignmentActive }"
                             @click="closeStaffShiftDropdown"
@@ -419,10 +419,10 @@
                             </svg>
                             <span>Role Assignment</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_shifts') || isSuperAdmin"
-                            :to="{ name: 'shiftScheduling' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'shiftScheduling' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isShiftSchedulingActive }"
                             @click="closeStaffShiftDropdown"
@@ -433,10 +433,10 @@
                             </svg>
                             <span>Shift Scheduling</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_attendance') || hasPermission('manage_staff') || isSuperAdmin"
-                            :to="{ name: 'attendance' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'attendance' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isAttendanceActive }"
                             @click="closeStaffShiftDropdown"
@@ -448,10 +448,10 @@
                             </svg>
                             <span>Attendance</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_housekeeping') || hasPermission('manage_staff') || isSuperAdmin"
-                            :to="{ name: 'taskAssignment' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'taskAssignment' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isTaskAssignmentActive }"
                             @click="closeStaffShiftDropdown"
@@ -463,10 +463,10 @@
                             </svg>
                             <span>Task Assignment</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_staff') || isSuperAdmin"
-                            :to="{ name: 'performanceLogs' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'performanceLogs' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isPerformanceLogsActive }"
                             @click="closeStaffShiftDropdown"
@@ -480,15 +480,15 @@
                         </router-link>
                     </div>
                 </div>
-                
+
                 <!-- Billing & Finance Dropdown -->
-                <div 
+                <div
                     v-if="hasPermission('view_billing') || hasPermission('manage_billing') || hasPermission('manage_accounts') || isSuperAdmin"
                     class="menu-dropdown"
                     :class="{ 'dropdown-open': isBillingFinanceDropdownOpen, 'active': isBillingFinanceActive }"
                 >
-                    <button 
-                        class="menu-item menu-dropdown-toggle" 
+                    <button
+                        class="menu-item menu-dropdown-toggle"
                         @click="toggleBillingFinanceDropdown"
                     >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -499,11 +499,11 @@
                             <circle cx="15" cy="12" r="1" fill="currentColor"/>
                         </svg>
                         <span v-if="!sidebarMini">Billing & Finance</span>
-                        <svg 
-                            v-if="!sidebarMini" 
-                            width="16" 
-                            height="16" 
-                            viewBox="0 0 16 16" 
+                        <svg
+                            v-if="!sidebarMini"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
                             fill="none"
                             class="dropdown-arrow"
                             :class="{ 'rotated': isBillingFinanceDropdownOpen }"
@@ -512,10 +512,10 @@
                         </svg>
                     </button>
                     <div v-if="isBillingFinanceDropdownOpen && !sidebarMini" class="menu-dropdown-content">
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_billing') || hasPermission('manage_billing') || isSuperAdmin"
-                            :to="{ name: 'unifiedGuestFolio' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'unifiedGuestFolio' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isUnifiedGuestFolioActive }"
                             @click="closeBillingFinanceDropdown"
@@ -526,10 +526,10 @@
                             </svg>
                             <span>Unified Guest Folio</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_billing') || isSuperAdmin"
-                            :to="{ name: 'splitBilling' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'splitBilling' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isSplitBillingActive }"
                             @click="closeBillingFinanceDropdown"
@@ -543,10 +543,10 @@
                             </svg>
                             <span>Split Billing</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_payments') || hasPermission('manage_billing') || isSuperAdmin"
-                            :to="{ name: 'partialPayments' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'partialPayments' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isPartialPaymentsActive }"
                             @click="closeBillingFinanceDropdown"
@@ -557,10 +557,10 @@
                             </svg>
                             <span>Partial Payments</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_payments') || hasPermission('manage_billing') || isSuperAdmin"
-                            :to="{ name: 'advancePayments' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'advancePayments' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isAdvancePaymentsActive }"
                             @click="closeBillingFinanceDropdown"
@@ -571,10 +571,10 @@
                             </svg>
                             <span>Advance Payments</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_payments') || hasPermission('manage_billing') || isSuperAdmin"
-                            :to="{ name: 'refundHandling' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'refundHandling' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isRefundHandlingActive }"
                             @click="closeBillingFinanceDropdown"
@@ -584,10 +584,10 @@
                             </svg>
                             <span>Refund Handling</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_billing') || hasPermission('manage_accounts') || isSuperAdmin"
-                            :to="{ name: 'taxServiceCharge' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'taxServiceCharge' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isTaxServiceChargeActive }"
                             @click="closeBillingFinanceDropdown"
@@ -598,10 +598,10 @@
                             </svg>
                             <span>Tax & Service Charge</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_accounts') || hasPermission('view_financial_reports') || isSuperAdmin"
-                            :to="{ name: 'expenseTracking' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'expenseTracking' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isExpenseTrackingActive }"
                             @click="closeBillingFinanceDropdown"
@@ -612,10 +612,10 @@
                             </svg>
                             <span>Expense Tracking</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_payments') || hasPermission('manage_accounts') || isSuperAdmin"
-                            :to="{ name: 'supplierPayments' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'supplierPayments' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isSupplierPaymentsActive }"
                             @click="closeBillingFinanceDropdown"
@@ -627,10 +627,10 @@
                             </svg>
                             <span>Supplier Payments</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_accounts') || hasPermission('view_financial_reports') || isSuperAdmin"
-                            :to="{ name: 'dailyCashClosing' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'dailyCashClosing' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isDailyCashClosingActive }"
                             @click="closeBillingFinanceDropdown"
@@ -641,10 +641,10 @@
                             </svg>
                             <span>Daily Cash Closing</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_financial_reports') || hasPermission('view_reports') || isSuperAdmin"
-                            :to="{ name: 'profitLossReport' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'profitLossReport' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isProfitLossReportActive }"
                             @click="closeBillingFinanceDropdown"
@@ -658,15 +658,15 @@
                         </router-link>
                     </div>
                 </div>
-                
+
                 <!-- Reports & Analytics Dropdown -->
-                <div 
+                <div
                     v-if="hasPermission('view_reports') || isSuperAdmin"
                     class="menu-dropdown"
                     :class="{ 'dropdown-open': isReportsAnalyticsDropdownOpen, 'active': isReportsAnalyticsActive }"
                 >
-                    <button 
-                        class="menu-item menu-dropdown-toggle" 
+                    <button
+                        class="menu-item menu-dropdown-toggle"
                         @click="toggleReportsAnalyticsDropdown"
                     >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -676,11 +676,11 @@
                             <circle cx="15" cy="12" r="1.5" fill="currentColor"/>
                         </svg>
                         <span v-if="!sidebarMini">Reports & Analytics</span>
-                        <svg 
-                            v-if="!sidebarMini" 
-                            width="16" 
-                            height="16" 
-                            viewBox="0 0 16 16" 
+                        <svg
+                            v-if="!sidebarMini"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
                             fill="none"
                             class="dropdown-arrow"
                             :class="{ 'rotated': isReportsAnalyticsDropdownOpen }"
@@ -689,10 +689,10 @@
                         </svg>
                     </button>
                     <div v-if="isReportsAnalyticsDropdownOpen && !sidebarMini" class="menu-dropdown-content">
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_reports') || isSuperAdmin"
-                            :to="{ name: 'occupancyRateReport' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'occupancyRateReport' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isOccupancyRateReportActive }"
                             @click="closeReportsAnalyticsDropdown"
@@ -703,10 +703,10 @@
                             </svg>
                             <span>Occupancy Rate</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_reports') || hasPermission('view_financial_reports') || isSuperAdmin"
-                            :to="{ name: 'dailyMonthlyRevenueReport' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'dailyMonthlyRevenueReport' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isDailyMonthlyRevenueReportActive }"
                             @click="closeReportsAnalyticsDropdown"
@@ -717,10 +717,10 @@
                             </svg>
                             <span>Daily/Monthly Revenue</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_reports') || isSuperAdmin"
-                            :to="{ name: 'roomTypePerformanceReport' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'roomTypePerformanceReport' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isRoomTypePerformanceReportActive }"
                             @click="closeReportsAnalyticsDropdown"
@@ -731,10 +731,10 @@
                             </svg>
                             <span>Room Type Performance</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_reports') || hasPermission('view_restaurant_orders') || isSuperAdmin"
-                            :to="{ name: 'restaurantSalesReport' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'restaurantSalesReport' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isRestaurantSalesReportActive }"
                             @click="closeReportsAnalyticsDropdown"
@@ -745,10 +745,10 @@
                             </svg>
                             <span>Restaurant Sales</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_reports') || hasPermission('view_room_service') || isSuperAdmin"
-                            :to="{ name: 'roomServicePerformanceReport' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'roomServicePerformanceReport' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isRoomServicePerformanceReportActive }"
                             @click="closeReportsAnalyticsDropdown"
@@ -759,10 +759,10 @@
                             </svg>
                             <span>Room Service Performance</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_reports') || hasPermission('manage_amenities') || isSuperAdmin"
-                            :to="{ name: 'amenitiesUsageReport' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'amenitiesUsageReport' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isAmenitiesUsageReportActive }"
                             @click="closeReportsAnalyticsDropdown"
@@ -773,10 +773,10 @@
                             </svg>
                             <span>Amenities Usage</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_reports') || hasPermission('view_housekeeping') || hasPermission('manage_housekeeping') || isSuperAdmin"
-                            :to="{ name: 'housekeepingEfficiencyReport' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'housekeepingEfficiencyReport' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isHousekeepingEfficiencyReportActive }"
                             @click="closeReportsAnalyticsDropdown"
@@ -787,10 +787,10 @@
                             </svg>
                             <span>Housekeeping Efficiency</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_reports') || hasPermission('view_inventory') || isSuperAdmin"
-                            :to="{ name: 'inventoryConsumptionReport' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'inventoryConsumptionReport' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isInventoryConsumptionReportActive }"
                             @click="closeReportsAnalyticsDropdown"
@@ -801,10 +801,10 @@
                             </svg>
                             <span>Inventory Consumption</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_reports') || hasPermission('view_financial_reports') || isSuperAdmin"
-                            :to="{ name: 'expenseVsIncomeReport' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'expenseVsIncomeReport' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isExpenseVsIncomeReportActive }"
                             @click="closeReportsAnalyticsDropdown"
@@ -815,10 +815,10 @@
                             </svg>
                             <span>Expense vs Income</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_reports') || hasPermission('manage_staff') || isSuperAdmin"
-                            :to="{ name: 'staffProductivityReport' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'staffProductivityReport' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isStaffProductivityReportActive }"
                             @click="closeReportsAnalyticsDropdown"
@@ -831,15 +831,15 @@
                         </router-link>
                     </div>
                 </div>
-                
+
                 <!-- Settings & White-Labeling Dropdown -->
-                <div 
+                <div
                     v-if="hasPermission('system_settings') || hasPermission('manage_system') || isSuperAdmin"
                     class="menu-dropdown"
                     :class="{ 'dropdown-open': isSettingsWhiteLabelingDropdownOpen, 'active': isSettingsWhiteLabelingActive }"
                 >
-                    <button 
-                        class="menu-item menu-dropdown-toggle" 
+                    <button
+                        class="menu-item menu-dropdown-toggle"
                         @click="toggleSettingsWhiteLabelingDropdown"
                     >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -847,11 +847,11 @@
                             <path d="M10 2V4M10 16V18M18 10H16M4 10H2M15.6569 4.34315L14.2426 5.75736M5.75736 14.2426L4.34315 15.6569M15.6569 15.6569L14.2426 14.2426M5.75736 5.75736L4.34315 4.34315" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                         <span v-if="!sidebarMini">Settings & White-Labeling</span>
-                        <svg 
-                            v-if="!sidebarMini" 
-                            width="16" 
-                            height="16" 
-                            viewBox="0 0 16 16" 
+                        <svg
+                            v-if="!sidebarMini"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
                             fill="none"
                             class="dropdown-arrow"
                             :class="{ 'rotated': isSettingsWhiteLabelingDropdownOpen }"
@@ -860,10 +860,10 @@
                         </svg>
                     </button>
                     <div v-if="isSettingsWhiteLabelingDropdownOpen && !sidebarMini" class="menu-dropdown-content">
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('system_settings') || isSuperAdmin"
-                            :to="{ name: 'logoColorTheme' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'logoColorTheme' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isLogoColorThemeActive }"
                             @click="closeSettingsWhiteLabelingDropdown"
@@ -874,10 +874,10 @@
                             </svg>
                             <span>Logo, Color Theme, Hotel Name</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('system_settings') || isSuperAdmin"
-                            :to="{ name: 'invoiceReceiptTemplates' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'invoiceReceiptTemplates' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isInvoiceReceiptTemplatesActive }"
                             @click="closeSettingsWhiteLabelingDropdown"
@@ -888,10 +888,10 @@
                             </svg>
                             <span>Invoice & Receipt Templates</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('system_settings') || isSuperAdmin"
-                            :to="{ name: 'customFooterBranding' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'customFooterBranding' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isCustomFooterBrandingActive }"
                             @click="closeSettingsWhiteLabelingDropdown"
@@ -902,10 +902,10 @@
                             </svg>
                             <span>Custom Footer Branding</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_system') || isSuperAdmin"
-                            :to="{ name: 'moduleEnableDisable' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'moduleEnableDisable' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isModuleEnableDisableActive }"
                             @click="closeSettingsWhiteLabelingDropdown"
@@ -916,10 +916,10 @@
                             </svg>
                             <span>Module Enable/Disable</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('system_settings') || isSuperAdmin"
-                            :to="{ name: 'taxCurrencySetup' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'taxCurrencySetup' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isTaxCurrencySetupActive }"
                             @click="closeSettingsWhiteLabelingDropdown"
@@ -930,10 +930,10 @@
                             </svg>
                             <span>Tax & Currency Setup</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('system_settings') || isSuperAdmin"
-                            :to="{ name: 'languageSettings' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'languageSettings' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isLanguageSettingsActive }"
                             @click="closeSettingsWhiteLabelingDropdown"
@@ -948,25 +948,25 @@
                 </div>
 
                 <!-- Backup, Logs & Security Dropdown -->
-                <div 
+                <div
                     v-if="hasPermission('manage_system') || hasPermission('system_settings') || isSuperAdmin"
                     class="menu-dropdown"
                     :class="{ 'dropdown-open': isBackupLogsSecurityDropdownOpen, 'active': isBackupLogsSecurityActive }"
                     ref="backupLogsSecurityDropdown"
                 >
-                    <button 
-                        class="menu-item menu-dropdown-toggle" 
+                    <button
+                        class="menu-item menu-dropdown-toggle"
                         @click="toggleBackupLogsSecurityDropdown"
                     >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M10 2L3 5V9C3 13.4183 6.58172 17 11 17C15.4183 17 19 13.4183 19 9V5L12 2M10 2L17 5M10 2V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         <span v-if="!sidebarMini">Backup, Logs & Security</span>
-                        <svg 
-                            v-if="!sidebarMini" 
-                            width="16" 
-                            height="16" 
-                            viewBox="0 0 16 16" 
+                        <svg
+                            v-if="!sidebarMini"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 16 16"
                             fill="none"
                             class="dropdown-arrow"
                             :class="{ 'rotated': isBackupLogsSecurityDropdownOpen }"
@@ -975,10 +975,10 @@
                         </svg>
                     </button>
                     <div v-if="isBackupLogsSecurityDropdownOpen && !sidebarMini" class="menu-dropdown-content">
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_system') || isSuperAdmin"
-                            :to="{ name: 'dailyAutoBackup' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'dailyAutoBackup' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isDailyAutoBackupActive }"
                             @click="closeBackupLogsSecurityDropdown"
@@ -988,10 +988,10 @@
                             </svg>
                             <span>Daily Auto-Backup</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_system') || isSuperAdmin"
-                            :to="{ name: 'manualBackup' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'manualBackup' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isManualBackupActive }"
                             @click="closeBackupLogsSecurityDropdown"
@@ -1001,10 +1001,10 @@
                             </svg>
                             <span>Manual Backup</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_system') || isSuperAdmin"
-                            :to="{ name: 'activityLogs' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'activityLogs' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isActivityLogsActive }"
                             @click="closeBackupLogsSecurityDropdown"
@@ -1015,10 +1015,10 @@
                             </svg>
                             <span>Activity Logs</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('view_roles') || hasPermission('manage_role_permissions') || isSuperAdmin"
-                            :to="{ name: 'roleBasedPermissions' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'roleBasedPermissions' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isRoleBasedPermissionsActive }"
                             @click="closeBackupLogsSecurityDropdown"
@@ -1029,10 +1029,10 @@
                             </svg>
                             <span>Role-Based Permissions</span>
                         </router-link>
-                        <router-link 
+                        <router-link
                             v-if="hasPermission('manage_system') || isSuperAdmin"
-                            :to="{ name: 'secureAuthentication' }" 
-                            class="menu-dropdown-item" 
+                            :to="{ name: 'secureAuthentication' }"
+                            class="menu-dropdown-item"
                             active-class="active"
                             :class="{ active: isSecureAuthenticationActive }"
                             @click="closeBackupLogsSecurityDropdown"
@@ -1045,7 +1045,7 @@
                     </div>
                 </div>
             </nav>
-            
+
             <div class="sidebar-footer">
                 <button class="sidebar-toggle-btn" @click="toggleSidebar">
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -1060,7 +1060,7 @@
                 </button>
             </div>
         </aside>
-        
+
         <!-- Main Content Area -->
         <div class="app-main">
             <!-- Top Header -->
@@ -1073,7 +1073,7 @@
                     </button>
                     <h1 class="page-title">{{ currentPageTitle }}</h1>
                 </div>
-                
+
                 <div class="header-right">
                     <div class="header-search">
                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -1082,7 +1082,7 @@
                         </svg>
                         <input type="text" placeholder="Search..." />
                     </div>
-                    
+
                     <button class="header-icon-btn">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M10 2C10 1.44772 9.55228 1 9 1C8.44772 1 8 1.44772 8 2V3H3C2.44772 3 2 3.44772 2 4V5H18V4C18 3.44772 17.5523 3 17 3H12V2Z" fill="currentColor"/>
@@ -1090,11 +1090,11 @@
                         </svg>
                         <span class="badge">3</span>
                     </button>
-                    
+
                     <!-- User Dropdown -->
                     <div class="user-dropdown-wrapper">
-                        <button 
-                            class="user-dropdown-toggle" 
+                        <button
+                            class="user-dropdown-toggle"
                             @click="toggleUserDropdown"
                             :class="{ 'active': isUserDropdownOpen }"
                         >
@@ -1105,10 +1105,10 @@
                                 <span class="user-name">{{ userName }}</span>
                                 <span class="user-role">{{ userRoleName }}</span>
                             </div>
-                            <svg 
-                                width="16" 
-                                height="16" 
-                                viewBox="0 0 16 16" 
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
                                 fill="none"
                                 class="dropdown-arrow"
                                 :class="{ 'rotated': isUserDropdownOpen }"
@@ -1138,17 +1138,17 @@
                     </div>
                 </div>
             </header>
-            
+
             <!-- Page Content -->
             <main class="app-content">
                 <router-view />
             </main>
-            
+
             <!-- Footer -->
             <footer class="app-footer">
                 <div class="footer-content">
                     <div class="footer-left">
-                        <p>&copy; {{ currentYear }} ArchitectUI. All rights reserved.</p>
+                        <p>&copy; {{ currentYear }} Hotel Management System. All rights reserved.</p>
                     </div>
                     <div class="footer-right">
                         <a href="#" class="footer-link">Privacy Policy</a>
@@ -1175,17 +1175,17 @@ export default {
         const router = useRouter();
         const route = useRoute();
         const { hasPermissionSync, isSuperAdmin, getUserData, getUserDataSync } = usePermissions();
-        
+
         // Create reactive user data ref to trigger updates
         const userData = ref(null);
         const userDataLoaded = ref(false);
-        
+
         // Watch for user data changes and update reactive ref
         watch(() => getUserDataSync(), (newUserData) => {
             userData.value = newUserData;
             userDataLoaded.value = !!newUserData;
         }, { immediate: true });
-        
+
         // Create reactive permission check function that updates when user data changes
         // NOTE: For sidebar navigation, we now always allow access so all menu items are visible
         // for any authenticated user, regardless of stored permissions or role.
@@ -1316,7 +1316,7 @@ export default {
         });
 
         const isHousekeepingActive = computed(() => {
-            return (route.name === 'housekeeping' || route.path === '/housekeeping' || route.path.startsWith('/housekeeping/')) 
+            return (route.name === 'housekeeping' || route.path === '/housekeeping' || route.path.startsWith('/housekeeping/'))
                 && !route.path.startsWith('/housekeeping-efficiency-report');
         });
 
@@ -1325,11 +1325,11 @@ export default {
         });
 
         const isHotelOperationsActive = computed(() => {
-            return isRestaurantOperationsActive.value || 
-                   isRoomsActive.value || 
-                   isRoomReservationsActive.value || 
-                   isFrontDeskOperationsActive.value || 
-                   isAmenitiesServicesActive.value || 
+            return isRestaurantOperationsActive.value ||
+                   isRoomsActive.value ||
+                   isRoomReservationsActive.value ||
+                   isFrontDeskOperationsActive.value ||
+                   isAmenitiesServicesActive.value ||
                    isHousekeepingActive.value;
         });
 
@@ -1337,11 +1337,11 @@ export default {
 
         // Auto-open dropdown if any child route is active
         watch(() => route.path, (newPath) => {
-            if (newPath.startsWith('/restaurant-operations') || 
-                newPath.startsWith('/rooms') || 
-                newPath.startsWith('/room-reservations') || 
-                newPath.startsWith('/front-desk-operations') || 
-                newPath.startsWith('/amenities-services') || 
+            if (newPath.startsWith('/restaurant-operations') ||
+                newPath.startsWith('/rooms') ||
+                newPath.startsWith('/room-reservations') ||
+                newPath.startsWith('/front-desk-operations') ||
+                newPath.startsWith('/amenities-services') ||
                 (newPath.startsWith('/housekeeping') && !newPath.startsWith('/housekeeping-efficiency-report'))) {
                 isHotelOperationsDropdownOpen.value = true;
             }
@@ -1497,9 +1497,9 @@ export default {
         });
 
         const isBillingFinanceActive = computed(() => {
-            return isUnifiedGuestFolioActive.value || isSplitBillingActive.value || isPartialPaymentsActive.value || 
-                   isAdvancePaymentsActive.value || isRefundHandlingActive.value || isTaxServiceChargeActive.value || 
-                   isExpenseTrackingActive.value || isSupplierPaymentsActive.value || isDailyCashClosingActive.value || 
+            return isUnifiedGuestFolioActive.value || isSplitBillingActive.value || isPartialPaymentsActive.value ||
+                   isAdvancePaymentsActive.value || isRefundHandlingActive.value || isTaxServiceChargeActive.value ||
+                   isExpenseTrackingActive.value || isSupplierPaymentsActive.value || isDailyCashClosingActive.value ||
                    isProfitLossReportActive.value;
         });
 
@@ -1507,10 +1507,10 @@ export default {
 
         // Auto-open dropdown if any child route is active
         watch(() => route.path, (newPath) => {
-            if (newPath.startsWith('/unified-guest-folio') || newPath.startsWith('/split-billing') || 
-                newPath.startsWith('/partial-payments') || newPath.startsWith('/advance-payments') || 
-                newPath.startsWith('/refund-handling') || newPath.startsWith('/tax-service-charge') || 
-                newPath.startsWith('/expense-tracking') || newPath.startsWith('/supplier-payments') || 
+            if (newPath.startsWith('/unified-guest-folio') || newPath.startsWith('/split-billing') ||
+                newPath.startsWith('/partial-payments') || newPath.startsWith('/advance-payments') ||
+                newPath.startsWith('/refund-handling') || newPath.startsWith('/tax-service-charge') ||
+                newPath.startsWith('/expense-tracking') || newPath.startsWith('/supplier-payments') ||
                 newPath.startsWith('/daily-cash-closing') || newPath.startsWith('/profit-loss-report')) {
                 isBillingFinanceDropdownOpen.value = true;
             }
@@ -1569,7 +1569,7 @@ export default {
         });
 
         const isReportsAnalyticsActive = computed(() => {
-            return isOccupancyRateReportActive.value || isDailyMonthlyRevenueReportActive.value || 
+            return isOccupancyRateReportActive.value || isDailyMonthlyRevenueReportActive.value ||
                    isRoomTypePerformanceReportActive.value || isRestaurantSalesReportActive.value ||
                    isRoomServicePerformanceReportActive.value || isAmenitiesUsageReportActive.value ||
                    isHousekeepingEfficiencyReportActive.value || isInventoryConsumptionReportActive.value ||
@@ -1580,7 +1580,7 @@ export default {
 
         // Auto-open dropdown if any child route is active
         watch(() => route.path, (newPath) => {
-            if (newPath.startsWith('/occupancy-rate-report') || newPath.startsWith('/daily-monthly-revenue-report') || 
+            if (newPath.startsWith('/occupancy-rate-report') || newPath.startsWith('/daily-monthly-revenue-report') ||
                 newPath.startsWith('/room-type-performance-report') || newPath.startsWith('/restaurant-sales-report') ||
                 newPath.startsWith('/room-service-performance-report') || newPath.startsWith('/amenities-usage-report') ||
                 newPath.startsWith('/housekeeping-efficiency-report') || newPath.startsWith('/inventory-consumption-report') ||
@@ -1626,7 +1626,7 @@ export default {
         });
 
         const isSettingsWhiteLabelingActive = computed(() => {
-            return isLogoColorThemeActive.value || isInvoiceReceiptTemplatesActive.value || isCustomFooterBrandingActive.value || 
+            return isLogoColorThemeActive.value || isInvoiceReceiptTemplatesActive.value || isCustomFooterBrandingActive.value ||
                    isModuleEnableDisableActive.value || isTaxCurrencySetupActive.value || isLanguageSettingsActive.value;
         });
 
@@ -1634,8 +1634,8 @@ export default {
 
         // Auto-open dropdown if any child route is active
         watch(() => route.path, (newPath) => {
-            if (newPath.startsWith('/logo-color-theme') || newPath.startsWith('/invoice-receipt-templates') || 
-                newPath.startsWith('/custom-footer-branding') || newPath.startsWith('/module-enable-disable') || 
+            if (newPath.startsWith('/logo-color-theme') || newPath.startsWith('/invoice-receipt-templates') ||
+                newPath.startsWith('/custom-footer-branding') || newPath.startsWith('/module-enable-disable') ||
                 newPath.startsWith('/tax-currency-setup') || newPath.startsWith('/language-settings')) {
                 isSettingsWhiteLabelingDropdownOpen.value = true;
             }
@@ -1677,7 +1677,7 @@ export default {
             // #region agent log
             fetch('http://127.0.0.1:7245/ingest/9401a1a8-1208-480e-b431-a6361cb9534c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Dashboard.vue:1558',message:'isBackupLogsSecurityActive computed',data:{isDailyAutoBackupActive:isDailyAutoBackupActive.value,isManualBackupActive:isManualBackupActive.value,isActivityLogsActive:isActivityLogsActive.value,isRoleBasedPermissionsActive:isRoleBasedPermissionsActive.value,isSecureAuthenticationActive:isSecureAuthenticationActive.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
             // #endregion
-            return isDailyAutoBackupActive.value || isManualBackupActive.value || isActivityLogsActive.value || 
+            return isDailyAutoBackupActive.value || isManualBackupActive.value || isActivityLogsActive.value ||
                    isRoleBasedPermissionsActive.value || isSecureAuthenticationActive.value;
         });
 
@@ -1692,8 +1692,8 @@ export default {
             // #region agent log
             fetch('http://127.0.0.1:7245/ingest/9401a1a8-1208-480e-b431-a6361cb9534c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Dashboard.vue:1566',message:'route.path watch triggered',data:{newPath,currentDropdownOpen:isBackupLogsSecurityDropdownOpen.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
             // #endregion
-            if (newPath.startsWith('/daily-auto-backup') || newPath.startsWith('/manual-backup') || 
-                newPath.startsWith('/activity-logs') || newPath.startsWith('/role-based-permissions') || 
+            if (newPath.startsWith('/daily-auto-backup') || newPath.startsWith('/manual-backup') ||
+                newPath.startsWith('/activity-logs') || newPath.startsWith('/role-based-permissions') ||
                 newPath.startsWith('/secure-authentication')) {
                 isBackupLogsSecurityDropdownOpen.value = true;
                 // #region agent log
@@ -1765,24 +1765,24 @@ export default {
                 // #region agent log
                 fetch('http://127.0.0.1:7245/ingest/9401a1a8-1208-480e-b431-a6361cb9534c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Dashboard.vue:loadHotelInfo','message':'Function entry','data':{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
                 // #endregion
-                
+
                 const response = await axios.get('/api/hotel/info');
                 const data = response.data;
-                
+
                 // #region agent log
                 fetch('http://127.0.0.1:7245/ingest/9401a1a8-1208-480e-b431-a6361cb9534c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Dashboard.vue:loadHotelInfo','message':'Response received','data':{'logo':data.logo,'favicon':data.favicon,'origin':window.location.origin,'pathname':window.location.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
                 // #endregion
-                
+
                 hotelName.value = data.name || '';
-                
+
                 // Format logo URL properly
                 if (data.logo) {
                     let logoUrl = data.logo;
-                    
+
                     // #region agent log
                     fetch('http://127.0.0.1:7245/ingest/9401a1a8-1208-480e-b431-a6361cb9534c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Dashboard.vue:loadHotelInfo','message':'Logo URL before processing','data':{'logoUrl':logoUrl,'startsWithHttp':logoUrl.startsWith('http')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
                     // #endregion
-                    
+
                     // If it's a full URL, use it directly
                     if (!logoUrl.startsWith('http')) {
                         // If it's a relative path, construct full URL
@@ -1793,22 +1793,22 @@ export default {
                             logoUrl = window.location.origin + '/storage/' + logoUrl;
                         }
                     }
-                    
+
                     // Keep app/public in path (do not remove)
-                    
+
                     // #region agent log
                     fetch('http://127.0.0.1:7245/ingest/9401a1a8-1208-480e-b431-a6361cb9534c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Dashboard.vue:loadHotelInfo','message':'Logo URL after processing','data':{'finalLogoUrl':logoUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
                     // #endregion
-                    
+
                     hotelLogo.value = logoUrl;
                 } else {
                     hotelLogo.value = null;
                 }
-                
+
                 // Format favicon URL properly
                 if (data.favicon) {
                     let faviconUrl = data.favicon;
-                    
+
                     // If it's a full URL, use it directly
                     if (!faviconUrl.startsWith('http')) {
                         // If it's a relative path, construct full URL
@@ -1819,11 +1819,11 @@ export default {
                             faviconUrl = window.location.origin + '/storage/' + faviconUrl;
                         }
                     }
-                    
+
                     // Keep app/public in path (do not remove)
-                    
+
                     hotelFavicon.value = faviconUrl;
-                    
+
                     // Update favicon dynamically
                     const faviconLink = document.getElementById('favicon-link');
                     if (faviconLink) {
@@ -1839,9 +1839,9 @@ export default {
                 } else {
                     hotelFavicon.value = null;
                 }
-                
+
                 hotelInfoLoaded.value = true;
-                
+
                 // Update page title
                 if (data.name) {
                     document.title = data.name + ' - Hotel Management System';
@@ -1868,7 +1868,7 @@ export default {
                 // #endregion
             }
         };
-        
+
         // Call immediately (don't wait for onMounted)
         initializeUserData();
 
@@ -1885,7 +1885,7 @@ export default {
                     userName.value = userData.name || userData.email || 'User';
                     userInitial.value = userData.name ? userData.name.charAt(0).toUpperCase() : (userData.email ? userData.email.charAt(0).toUpperCase() : 'U');
                     userRoleName.value = userData.roleName || userData.role || '';
-                    
+
                     // Ensure permissions cache is up to date
                     await getUserData();
                     // #region agent log
@@ -1898,10 +1898,10 @@ export default {
                 fetch('http://127.0.0.1:7245/ingest/9401a1a8-1208-480e-b431-a6361cb9534c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Dashboard.vue:1741',message:'Auth check error',data:{error:error.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
                 // #endregion
             }
-            
+
             // Load hotel information
             loadHotelInfo();
-            
+
             // Check if Backup Logs Security dropdown element exists in DOM
             setTimeout(() => {
                 // #region agent log
@@ -1913,19 +1913,19 @@ export default {
                 fetch('http://127.0.0.1:7245/ingest/9401a1a8-1208-480e-b431-a6361cb9534c',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Dashboard.vue:1750',message:'Checking dropdown element in DOM',data:{dropdownExists,dropdownInDOM,dropdownVisible,dropdownClasses,isBackupLogsSecurityDropdownOpen:isBackupLogsSecurityDropdownOpen.value,isBackupLogsSecurityActive:isBackupLogsSecurityActive.value,sidebarMini:sidebarMini.value},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
                 // #endregion
             }, 100);
-            
+
             // Add click outside listener for user dropdown
             document.addEventListener('click', handleClickOutside);
-            
+
             // Listen for hotel info updates from Hotel Setup page
             window.addEventListener('hotel-info-updated', (event) => {
                 const hotelData = event.detail;
                 hotelName.value = hotelData.name || '';
-                
+
                 // Format logo URL properly
                 if (hotelData.logo) {
                     let logoUrl = hotelData.logo;
-                    
+
                     // If it's a full URL, use it directly
                     if (!logoUrl.startsWith('http')) {
                         // If it's a relative path, construct full URL
@@ -1935,20 +1935,20 @@ export default {
                             logoUrl = window.location.origin + '/storage/' + logoUrl;
                         }
                     }
-                    
+
                     // Remove 'app/public' from URL if it exists
                     logoUrl = logoUrl.replace('/storage/app/public/', '/storage/');
                     logoUrl = logoUrl.replace('storage/app/public/', 'storage/');
-                    
+
                     hotelLogo.value = logoUrl;
                 } else {
                     hotelLogo.value = null;
                 }
-                
+
                 // Format favicon URL properly
                 if (hotelData.favicon) {
                     let faviconUrl = hotelData.favicon;
-                    
+
                     // If it's a full URL, use it directly
                     if (!faviconUrl.startsWith('http')) {
                         // If it's a relative path, construct full URL
@@ -1959,11 +1959,11 @@ export default {
                             faviconUrl = window.location.origin + '/storage/' + faviconUrl;
                         }
                     }
-                    
+
                     // Keep app/public in path (do not remove)
-                    
+
                     hotelFavicon.value = faviconUrl;
-                    
+
                     // Update favicon
                     const faviconLink = document.getElementById('favicon-link');
                     if (faviconLink) {
@@ -1979,7 +1979,7 @@ export default {
                 } else {
                     hotelFavicon.value = null;
                 }
-                
+
                 // Update page title
                 if (hotelData.name) {
                     document.title = hotelData.name + ' - Hotel Management System';
@@ -2110,7 +2110,7 @@ export default {
     background: #f7f8fc;
 }
 
-/* Sidebar Styles - ArchitectUI Theme */
+/* Sidebar Styles - Hotel Management System Theme */
 .app-sidebar {
     width: 260px;
     background: #2c3e50;
@@ -2771,32 +2771,32 @@ export default {
         gap: 12px;
         text-align: center;
     }
-    
+
     .footer-right {
         flex-wrap: wrap;
         justify-content: center;
     }
-    
+
     .app-sidebar {
         transform: translateX(-100%);
     }
-    
+
     .mobile-menu-btn {
         display: block;
     }
-    
+
     .app-main {
         margin-left: 0;
     }
-    
+
     .header-search {
         display: none;
     }
-    
+
     .header-logout-btn span {
         display: none;
     }
-    
+
     .header-logout-btn {
         padding: 8px;
         min-width: 36px;

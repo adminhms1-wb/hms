@@ -3,7 +3,7 @@
         <div class="login-container">
             <div class="login-left">
                 <div class="login-brand">
-                    <h1>ArchitectUI</h1>
+                    <h1>Hotel Management System</h1>
                     <p>Admin Dashboard Template</p>
                 </div>
             </div>
@@ -13,7 +13,7 @@
                         <h2>Welcome Back</h2>
                         <p>Please sign in to your account</p>
                     </div>
-                    
+
                     <form @submit.prevent="handleLogin" class="login-form">
                         <div class="form-group">
                             <label>Email</label>
@@ -25,7 +25,7 @@
                                 required
                             />
                         </div>
-                        
+
                         <div class="form-group">
                             <label>Password</label>
                             <input
@@ -36,7 +36,7 @@
                                 required
                             />
                         </div>
-                        
+
                         <div class="form-options">
                             <label class="checkbox-wrapper">
                                 <input type="checkbox" v-model="form.remember" />
@@ -44,15 +44,15 @@
                             </label>
                             <a href="#" class="forgot-link">Forgot password?</a>
                         </div>
-                        
+
                         <button type="submit" class="btn btn-primary btn-block" :disabled="loading">
                             {{ loading ? 'Signing in...' : 'Sign In' }}
                         </button>
-                        
+
                         <div class="login-divider">
                             <span>or</span>
                         </div>
-                        
+
                         <router-link to="/super-admin/login" class="btn btn-secondary btn-block">
                             Super Admin Login
                         </router-link>
@@ -322,12 +322,12 @@ export default {
     .login-container {
         flex-direction: column;
     }
-    
+
     .login-left {
         padding: 40px;
         min-height: 200px;
     }
-    
+
     .login-right {
         padding: 40px 20px;
     }
