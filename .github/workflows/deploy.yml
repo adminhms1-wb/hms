@@ -13,10 +13,10 @@ jobs:
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SERVER_HOST }}
-          username: master
+          username: master_xjhdfgsfru
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /home/master/applications/zsgsjrspqr/public_html
+            cd /home/master_xjhdfgsfru/applications/zsgsjrspqr/public_html
             git pull origin main
             composer install --no-dev --optimize-autoloader
             npm install
