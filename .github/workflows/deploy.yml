@@ -12,7 +12,7 @@ jobs:
       - name: Deploy to Cloudways Server
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SERVER_HOST }}
+          host: ${{ 165.227.187.148 }}
           username: master_xjhdfgsfru
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
