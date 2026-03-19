@@ -1,28 +1,295 @@
-name: Deploy Laravel with HMS
+name: Deploy to Live Server
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      # Opt in to Node.js 24 for GitHub Actions JavaScript-based actions
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+      # Frontend build settings
+      NODE_VERSION: "20.x"
+      NPM_TO_LATEST: "true"
+
+      # SSH settings (all should be set as GitHub repo secrets)
+      # SSH_HOST, SSH_USER, SSH_PORT, SSH_PRIVATE_KEY, APP_DIR
+      SSH_PORT_DEFAULT: "22"
 
     steps:
-      - name: Deploy to Cloudways Server
-        uses: appleboy/ssh-action@v1
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          host: ${{ 165.227.187.148 }}
-          username: master_xjhdfgsfru
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            cd /home/master_xjhdfgsfru/applications/zsgsjrspqr/public_html
-            git pull origin main
-            composer install --no-dev --optimize-autoloader
+          fetch-depth: 0
+
+      - name: Detect changed files (Vue/CSS)
+        id: changes
+        run: |
+          set -euo pipefail
+
+          BEFORE="${{ github.event.before }}"
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            BEFORE="$(git rev-parse HEAD~1)"
+          fi
+
+          CHANGED_FILES="$(git diff --name-only "$BEFORE" "${{ github.sha }}")"
+          echo "$CHANGED_FILES"
+
+          if echo "$CHANGED_FILES" | grep -E -q '(^|/)(resources/.*\.vue$|resources/.*\.css$|resources/.*\.(scss|sass)$|resources/.*\.(js|ts)$|resources/.*\.blade\.php$|tailwind\.config\.(js|cjs|mjs)$|postcss\.config\.(js|cjs|mjs)$|vite\.config\.(js|cjs|mjs)$|package\.json$|package-lock\.json$)'; then
+            echo "frontend_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "frontend_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Node.js
+        if: steps.changes.outputs.frontend_changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Upgrade npm (and show versions)
+        if: steps.changes.outputs.frontend_changed == 'true'
+        run: |
+          set -euo pipefail
+          echo "Node version: $(node -v)"
+          echo "NPM version: $(npm -v)"
+
+          if [ "${NPM_TO_LATEST}" = "true" ]; then
+            npm install -g npm@latest
+          fi
+
+          echo "Node version (after): $(node -v)"
+          echo "NPM version (after): $(npm -v)"
+
+      - name: Install dependencies
+        if: steps.changes.outputs.frontend_changed == 'true'
+        run: |
+          set -euo pipefail
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
             npm install
-            npm run build
-            php artisan migrate --force
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            chmod -R 775 storage bootstrap/cache
+          fi
+
+      - name: Build frontend (Vite)
+        if: steps.changes.outputs.frontend_changed == 'true'
+        run: |
+          set -euo pipefail
+          npm run build
+          if [ ! -f "public/build/manifest.json" ]; then
+            echo "Error: Vite manifest not generated at public/build/manifest.json"
+            ls -la public/build || true
+            exit 1
+          fi
+
+      - name: Configure SSH key
+        run: |
+          set -euo pipefail
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            echo "Error: SSH_PRIVATE_KEY secret is empty."
+            exit 1
+          fi
+
+          mkdir -p ~/.ssh
+          # Ensure key is written correctly (GitHub secrets may contain CRLF on some setups)
+          printf "%s\n" "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 700 ~/.ssh
+          chmod 600 ~/.ssh/deploy_key
+
+          # Fail fast if the key is not readable
+          ssh-keygen -y -f ~/.ssh/deploy_key >/dev/null 2>&1 || { echo "Error: SSH_PRIVATE_KEY is not a valid private key."; exit 1; }
+
+          # Print key fingerprint for debugging (does not reveal the key)
+          ssh-keygen -lf ~/.ssh/deploy_key || true
+
+      - name: Test SSH connection
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SSH_PORT:-}" ]; then
+            SSH_PORT="${SSH_PORT_DEFAULT}"
+          fi
+
+          echo "Testing SSH auth to ${SSH_USER}@${SSH_HOST}:${SSH_PORT} ..."
+
+          ssh -i ~/.ssh/deploy_key \
+            -p "$SSH_PORT" \
+            -T \
+            -o StrictHostKeyChecking=no \
+            -o IdentitiesOnly=yes \
+            -o PreferredAuthentications=publickey \
+            -o PubkeyAuthentication=yes \
+            -o PasswordAuthentication=no \
+            -o BatchMode=yes \
+            -o ConnectTimeout=20 \
+            "$SSH_USER@$SSH_HOST" "echo SSH_OK" || (echo "SSH test failed. Check server authorized_keys for this key and SSH_USER permissions." && exit 1)
+
+      - name: Upload backend code to server (no git needed on server)
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SSH_PORT:-}" ]; then
+            SSH_PORT="${SSH_PORT_DEFAULT}"
+          fi
+
+          echo "Uploading backend files to ${SSH_USER}@${SSH_HOST}:${APP_DIR}"
+
+          # Send the repository content and extract on the server.
+          # Excludes large or environment-specific folders/files.
+          tar -czf - \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='vendor' \
+            --exclude='storage' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='public/build' \
+            . | ssh -i ~/.ssh/deploy_key \
+                -p "$SSH_PORT" \
+                -o StrictHostKeyChecking=no \
+                -o IdentitiesOnly=yes \
+                -o PreferredAuthentications=publickey \
+                -o PubkeyAuthentication=yes \
+                -o PasswordAuthentication=no \
+                -o BatchMode=yes \
+                -o ConnectTimeout=20 \
+                "$SSH_USER@$SSH_HOST" "mkdir -p \"$APP_DIR\" && tar -xzf - -C \"$APP_DIR\""
+
+      - name: Deploy backend + (optional) upload frontend assets
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+        run: |
+          set -euo pipefail
+
+          # Default SSH port to 22 if SSH_PORT secret is empty/missing
+          if [ -z "${SSH_PORT:-}" ]; then
+            SSH_PORT="${SSH_PORT_DEFAULT}"
+          fi
+
+          # Clean APP_DIR value (GitHub secrets can sometimes include trailing newlines/CRLF)
+          APP_DIR_CLEAN="$(printf '%s' "${APP_DIR}" | tr -d '\r' | xargs)"
+
+          echo "Deploying to ${SSH_USER}@${SSH_HOST}:${SSH_PORT}"
+
+          # Resolve the Laravel project root on the server.
+          # Your APP_DIR secret might point to either:
+          # - Laravel root (contains artisan), or
+          # - public_html/web root (does not contain artisan).
+          APP_ROOT="$(
+            ssh -i ~/.ssh/deploy_key \
+              -p "$SSH_PORT" \
+              -o StrictHostKeyChecking=no \
+              -o IdentitiesOnly=yes \
+              -o PreferredAuthentications=publickey \
+              -o PubkeyAuthentication=yes \
+              -o PasswordAuthentication=no \
+              -o BatchMode=yes \
+              -o ConnectTimeout=20 \
+              "$SSH_USER@$SSH_HOST" \
+              "set -euo pipefail;
+               CAND=\"${APP_DIR_CLEAN}\";
+               FALLBACK_1=\"\${CAND%/public_html}\";
+               # 1) Provided path exists
+               if [ -d \"\$CAND\" ]; then ROOT=\"\$CAND\";
+               # 2) If public_html is provided, try parent
+               elif [ -d \"\$FALLBACK_1\" ]; then ROOT=\"\$FALLBACK_1\";
+               # 3) Try relative to home
+               elif [ -d \"\$HOME/\$CAND\" ]; then ROOT=\"\$HOME/\$CAND\";
+               # 4) Try relative fallback for public_html
+               elif [ -d \"\$HOME/\$FALLBACK_1\" ]; then ROOT=\"\$HOME/\$FALLBACK_1\";
+               else
+                 echo APP_DIR_NOT_FOUND >&2;
+                 echo \"CAND=\$CAND\" >&2;
+                 echo \"FALLBACK_1=\$FALLBACK_1\" >&2;
+                 (ls -ld \"\$CAND\" \"\$FALLBACK_1\" \"\$HOME/\$CAND\" \"\$HOME/\$FALLBACK_1\") 2>&1 >&2 || true;
+                 exit 1;
+               fi;
+               # If artisan isn't in ROOT but is one level above, adjust
+               if [ ! -f \"\$ROOT/artisan\" ] && [ -f \"\$(dirname \"\$ROOT\")/artisan\" ]; then
+                 ROOT=\"\$(dirname \"\$ROOT\")\";
+               fi;
+               if [ ! -f \"\$ROOT/artisan\" ]; then echo ARTISAN_NOT_FOUND >&2; exit 1; fi;
+               echo \"\$ROOT\""
+          )"
+
+          # Clean APP_ROOT to avoid issues from trailing newlines/CRLF in command substitution
+          APP_ROOT_CLEAN="$(printf '%s' "$APP_ROOT" | tr -d '\r' | xargs)"
+
+          ssh -i ~/.ssh/deploy_key \
+            -p "$SSH_PORT" \
+            -o StrictHostKeyChecking=no \
+            -o IdentitiesOnly=yes \
+            -o PreferredAuthentications=publickey \
+            -o PubkeyAuthentication=yes \
+            -o PasswordAuthentication=no \
+            -o BatchMode=yes \
+            -o ConnectTimeout=20 \
+            "$SSH_USER@$SSH_HOST" \
+            "set -euo pipefail;
+             cd \"$APP_ROOT_CLEAN\";
+             composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader;
+             php artisan migrate --force;
+             php artisan config:cache;
+             php artisan route:cache;
+             php artisan view:cache;"
+
+          if [ "${{ steps.changes.outputs.frontend_changed }}" = "true" ]; then
+            echo "Uploading frontend assets (public/build) ..."
+
+            # Upload to both:
+            # - resolved Laravel root ($APP_ROOT_CLEAN)
+            # - secret-provided Laravel root ($APP_DIR_CLEAN)
+            # so `public/build/manifest.json` is always where Laravel expects it.
+            DEST_PUBLIC_BUILD="$APP_ROOT_CLEAN/public/build"
+            DEST_PUBLIC_BUILD_FROM_SECRET="$APP_DIR_CLEAN/public/build"
+            DEST_PUBLIC_HTML_BUILD="$APP_ROOT_CLEAN/public_html/build"
+
+            ssh -i ~/.ssh/deploy_key \
+              -p "$SSH_PORT" \
+              -o StrictHostKeyChecking=no \
+              -o IdentitiesOnly=yes \
+              -o PreferredAuthentications=publickey \
+              -o PubkeyAuthentication=yes \
+              -o PasswordAuthentication=no \
+              -o BatchMode=yes \
+              -o ConnectTimeout=20 \
+              "$SSH_USER@$SSH_HOST" \
+              "set -euo pipefail;
+               rm -rf \"$DEST_PUBLIC_BUILD\" \"$DEST_PUBLIC_BUILD_FROM_SECRET\" \"$DEST_PUBLIC_HTML_BUILD\";
+               mkdir -p \"$DEST_PUBLIC_BUILD\" \"$DEST_PUBLIC_BUILD_FROM_SECRET\" \"$DEST_PUBLIC_HTML_BUILD\";
+               ls -ld \"$DEST_PUBLIC_BUILD\" \"$DEST_PUBLIC_BUILD_FROM_SECRET\" \"$DEST_PUBLIC_HTML_BUILD\";"
+
+            # Upload build output via tar stream (avoids `scp .../.` remote stat issues)
+            if [ ! -d "public/build" ]; then
+              echo "Error: local directory public/build does not exist. Build step may have failed."
+              exit 1
+            fi
+
+            tar -czf - -C "public/build" . | ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o PreferredAuthentications=publickey -o PubkeyAuthentication=yes -o PasswordAuthentication=no -o BatchMode=yes -o ConnectTimeout=20 \
+              "$SSH_USER@$SSH_HOST" "tar -xzf - -C \"$DEST_PUBLIC_BUILD\""
+
+            tar -czf - -C "public/build" . | ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o PreferredAuthentications=publickey -o PubkeyAuthentication=yes -o PasswordAuthentication=no -o BatchMode=yes -o ConnectTimeout=20 \
+              "$SSH_USER@$SSH_HOST" "tar -xzf - -C \"$DEST_PUBLIC_BUILD_FROM_SECRET\""
+
+            tar -czf - -C "public/build" . | ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -o PreferredAuthentications=publickey -o PubkeyAuthentication=yes -o PasswordAuthentication=no -o BatchMode=yes -o ConnectTimeout=20 \
+              "$SSH_USER@$SSH_HOST" "tar -xzf - -C \"$DEST_PUBLIC_HTML_BUILD\""
+          fi
+
