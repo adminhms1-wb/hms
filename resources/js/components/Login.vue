@@ -4,7 +4,7 @@
             <div class="login-left">
                 <div class="login-brand">
                     <h1>Hotel Management System</h1>
-                    <p>Admin Dashboard Template dfgghyy33377799</p>
+                    <p>Admin Dashboard Template</p>
                 </div>
             </div>
             <div class="login-right">
