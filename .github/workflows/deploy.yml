@@ -147,7 +147,10 @@ jobs:
             SSH_PORT="${SSH_PORT_DEFAULT}"
           fi
 
-          echo "Uploading backend files to ${SSH_USER}@${SSH_HOST}:${APP_DIR}"
+          # Clean APP_DIR value (GitHub secrets can sometimes include trailing newlines/CRLF)
+          APP_DIR_CLEAN="$(printf '%s' "${APP_DIR}" | tr -d '\r' | xargs)"
+
+          echo "Uploading backend files to ${SSH_USER}@${SSH_HOST}:${APP_DIR_CLEAN}"
 
           # Send the repository content and extract on the server.
           # Excludes large or environment-specific folders/files.
@@ -168,7 +171,7 @@ jobs:
                 -o PasswordAuthentication=no \
                 -o BatchMode=yes \
                 -o ConnectTimeout=20 \
-                "$SSH_USER@$SSH_HOST" "mkdir -p \"$APP_DIR\" && tar -xzf - -C \"$APP_DIR\""
+                "$SSH_USER@$SSH_HOST" "mkdir -p \"$APP_DIR_CLEAN\" && tar -xzf - -C \"$APP_DIR_CLEAN\""
 
       - name: Deploy backend + (optional) upload frontend assets
         env:
